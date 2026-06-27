@@ -372,6 +372,27 @@ p {
     margin: 0.5rem 0;
 }
 
+/* Journey Section */
+.journey-section {
+    margin: 2.5rem 0;
+}
+
+.journey-section p {
+    text-align: justify;
+    line-height: 1.9;
+    margin-bottom: 1.2rem;
+    color: var(--text-dark);
+}
+
+.journey-section a {
+    color: var(--accent-color);
+    text-decoration: none;
+}
+
+.journey-section a:hover {
+    text-decoration: underline;
+}
+
 /* Research Areas Diagram */
 .diagram-section {
     background: var(--light-bg);
