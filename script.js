@@ -1,163 +1,129 @@
-// Mobile Menu Toggle
-document.addEventListener('DOMContentLoaded', function() {
-    const hamburger = document.querySelector('.hamburger');
-    const navMenu = document.querySelector('.nav-menu');
-    const navLinks = document.querySelectorAll('.nav-menu a');
+document.addEventListener('DOMContentLoaded', function () {
 
-    // Toggle mobile menu
+    // ── Mobile menu toggle ──────────────────────────────────────────────────
+    const hamburger = document.querySelector('.hamburger');
+    const navMenu   = document.querySelector('.nav-menu');
+    const navLinks  = document.querySelectorAll('.nav-menu a');
+
     if (hamburger) {
-        hamburger.addEventListener('click', function() {
+        hamburger.addEventListener('click', function () {
             navMenu.classList.toggle('active');
             hamburger.classList.toggle('active');
         });
     }
 
-    // Close menu when a link is clicked
     navLinks.forEach(link => {
-        link.addEventListener('click', function() {
+        link.addEventListener('click', function () {
             navMenu.classList.remove('active');
-            if (hamburger) {
-                hamburger.classList.remove('active');
-            }
+            if (hamburger) hamburger.classList.remove('active');
         });
     });
 
-    // Smooth scrolling for internal links
+    // ── Active nav link (dynamic, based on current page) ───────────────────
+    const currentPage = window.location.pathname.split('/').pop() || 'index.html';
+    document.querySelectorAll('.nav-menu a').forEach(link => {
+        link.classList.remove('active');
+        if (link.getAttribute('href') === currentPage) link.classList.add('active');
+    });
+
+    // ── Smooth scroll for in-page anchor links ──────────────────────────────
     document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-        anchor.addEventListener('click', function(e) {
+        anchor.addEventListener('click', function (e) {
             e.preventDefault();
             const target = document.querySelector(this.getAttribute('href'));
-            if (target) {
-                target.scrollIntoView({
-                    behavior: 'smooth',
-                    block: 'start'
+            if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        });
+    });
+
+    // ── Scroll-in animation ─────────────────────────────────────────────────
+    const observer = new IntersectionObserver(entries => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.style.opacity    = '1';
+                entry.target.style.transform  = 'translateY(0)';
+                observer.unobserve(entry.target);
+            }
+        });
+    }, { threshold: 0.1, rootMargin: '0px 0px -80px 0px' });
+
+    document.querySelectorAll(
+        '.education-item, .publication-item, .highlight-card, ' +
+        '.contact-item, .news-item, .research-area-item'
+    ).forEach(el => {
+        el.style.opacity   = '0';
+        el.style.transform = 'translateY(20px)';
+        el.style.transition = 'opacity 0.45s ease, transform 0.45s ease';
+        observer.observe(el);
+    });
+
+    // ── Back-to-top button ──────────────────────────────────────────────────
+    const btn = document.createElement('button');
+    btn.id        = 'back-to-top';
+    btn.title     = 'Back to top';
+    btn.innerHTML = '&#8679;';
+    document.body.appendChild(btn);
+
+    window.addEventListener('scroll', () => {
+        btn.classList.toggle('visible', window.scrollY > 300);
+    });
+
+    btn.addEventListener('click', () => {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+
+    // ── Copy email to clipboard ─────────────────────────────────────────────
+    document.querySelectorAll('a[href^="mailto:"]').forEach(link => {
+        link.addEventListener('click', function (e) {
+            const email = this.getAttribute('href').replace('mailto:', '');
+            if (navigator.clipboard) {
+                navigator.clipboard.writeText(email).then(() => {
+                    showToast('Email copied to clipboard!');
                 });
             }
         });
     });
 
-    // Active navigation link highlighting based on current page
-    highlightCurrentNavLink();
+    // ── Auto-update footer year ─────────────────────────────────────────────
+    document.querySelectorAll('footer p').forEach(p => {
+        p.innerHTML = p.innerHTML.replace(/\d{4}(?= Anuj Kumar)/, new Date().getFullYear());
+    });
 
-    // Add animations on scroll
-    observeElementsOnScroll();
-});
-
-// Highlight current page in navigation
-function highlightCurrentNavLink() {
-    const currentPage = window.location.pathname.split('/').pop() || 'index.html';
-    const navLinks = document.querySelectorAll('.nav-menu a');
-
-    navLinks.forEach(link => {
-        const href = link.getAttribute('href');
-        if (href === currentPage) {
-            link.classList.add('active');
+    // ── Button click feedback ───────────────────────────────────────────────
+    document.addEventListener('click', function (e) {
+        if (e.target.matches('.btn-link, .social-btn, .quick-link')) {
+            e.target.style.transform = 'scale(0.95)';
+            setTimeout(() => { e.target.style.transform = ''; }, 150);
         }
     });
-}
 
-// Observe elements for scroll animations
-function observeElementsOnScroll() {
-    const observerOptions = {
-        threshold: 0.1,
-        rootMargin: '0px 0px -100px 0px'
-    };
-
-    const observer = new IntersectionObserver(function(entries) {
-        entries.forEach(entry => {
-            if (entry.isIntersecting) {
-                entry.target.style.opacity = '1';
-                entry.target.style.transform = 'translateY(0)';
-                observer.unobserve(entry.target);
-            }
-        });
-    }, observerOptions);
-
-    // Apply animation to cards and items
-    const animateElements = document.querySelectorAll(
-        '.education-item, .publication-item, .skill-item, .highlight-card, .contact-item'
-    );
-
-    animateElements.forEach(element => {
-        element.style.opacity = '0';
-        element.style.transform = 'translateY(20px)';
-        element.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
-        observer.observe(element);
-    });
-}
-
-// Enhance skill bars animation
-document.addEventListener('DOMContentLoaded', function() {
-    const skillBars = document.querySelectorAll('.skill-fill');
-
-    if (skillBars.length > 0) {
-        const skillObserverOptions = {
-            threshold: 0.5
-        };
-
-        const skillObserver = new IntersectionObserver(function(entries) {
+    // ── Lazy load images ────────────────────────────────────────────────────
+    document.querySelectorAll('img[data-src]').forEach(img => {
+        new IntersectionObserver((entries, obs) => {
             entries.forEach(entry => {
                 if (entry.isIntersecting) {
-                    const skillBar = entry.target;
-                    const width = skillBar.style.width;
-                    skillBar.style.width = '0';
-                    
-                    // Trigger reflow
-                    void skillBar.offsetWidth;
-                    
-                    skillBar.style.transition = 'width 1.5s ease';
-                    skillBar.style.width = width;
-                    
-                    skillObserver.unobserve(entry.target);
+                    img.src = img.dataset.src;
+                    img.removeAttribute('data-src');
+                    obs.unobserve(img);
                 }
             });
-        }, skillObserverOptions);
-
-        skillBars.forEach(bar => {
-            skillObserver.observe(bar);
-        });
-    }
-});
-
-// Add click feedback for buttons
-document.addEventListener('click', function(e) {
-    if (e.target.matches('.btn-link, .social-btn, .quick-link')) {
-        e.target.style.transform = 'scale(0.95)';
-        setTimeout(() => {
-            e.target.style.transform = 'scale(1)';
-        }, 100);
-    }
-});
-
-// Utility function to format dates
-function formatDate(dateString) {
-    const options = { year: 'numeric', month: 'long', day: 'numeric' };
-    return new Date(dateString).toLocaleDateString('en-US', options);
-}
-
-// Lazy load images if any
-function lazyLoadImages() {
-    const images = document.querySelectorAll('img[data-src]');
-    const imageObserver = new IntersectionObserver((entries, observer) => {
-        entries.forEach(entry => {
-            if (entry.isIntersecting) {
-                const img = entry.target;
-                img.src = img.dataset.src;
-                img.removeAttribute('data-src');
-                observer.unobserve(img);
-            }
-        });
+        }).observe(img);
     });
-
-    images.forEach(img => imageObserver.observe(img));
-}
-
-// Initialize on page load
-window.addEventListener('load', function() {
-    lazyLoadImages();
 });
 
-// Print friendly styles
-window.addEventListener('beforeprint', function() {
+// ── Toast notification ──────────────────────────────────────────────────────
+function showToast(message) {
+    let toast = document.getElementById('toast');
+    if (!toast) {
+        toast = document.createElement('div');
+        toast.id = 'toast';
+        document.body.appendChild(toast);
+    }
+    toast.textContent = message;
+    toast.classList.add('show');
+    setTimeout(() => toast.classList.remove('show'), 2500);
+}
+
+// ── Print: force white background ──────────────────────────────────────────
+window.addEventListener('beforeprint', () => {
     document.body.style.backgroundColor = 'white';
 });
