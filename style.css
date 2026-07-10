@@ -372,6 +372,62 @@ p {
     margin: 0.5rem 0;
 }
 
+/* News / Recent Updates Section */
+.news-section {
+    margin: 2.5rem 0;
+}
+
+.news-list {
+    list-style: none;
+    padding: 0;
+    margin-top: 1rem;
+}
+
+.news-item {
+    display: flex;
+    gap: 1.2rem;
+    align-items: flex-start;
+    padding: 0.9rem 1rem;
+    border-left: 3px solid var(--accent-color);
+    margin-bottom: 0.8rem;
+    background: var(--light-bg);
+    border-radius: 0 6px 6px 0;
+    transition: background 0.2s ease, border-color 0.2s ease;
+}
+
+.news-item:hover {
+    background: rgba(52, 152, 219, 0.07);
+    border-left-color: var(--primary-color);
+}
+
+.news-date {
+    min-width: 70px;
+    font-size: 0.82rem;
+    font-weight: 700;
+    color: var(--primary-color);
+    background: rgba(26, 84, 144, 0.08);
+    padding: 0.2rem 0.5rem;
+    border-radius: 4px;
+    text-align: center;
+    height: fit-content;
+    white-space: nowrap;
+}
+
+.news-text {
+    font-size: 0.95rem;
+    line-height: 1.6;
+    color: var(--text-dark);
+}
+
+.news-text a {
+    color: var(--accent-color);
+    text-decoration: none;
+}
+
+.news-text a:hover {
+    text-decoration: underline;
+}
+
 /* Journey Section */
 .journey-section {
     margin: 2.5rem 0;
